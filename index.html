@@ -223,7 +223,7 @@
                 <div class="relative w-full pb-[56.25%] bg-black overflow-hidden group">
                     
                     <!-- 100% Non-Copyright Procedural 60FPS Vice City 4K Animated Canvas -->
-                    <canvas id="non-copyright-canvas" class="absolute inset-0 w-full h-full object-cover z-0"></canvas>
+                    <canvas id="non-copyright-canvas" width="1280" height="720" class="absolute inset-0 w-full h-full object-cover z-0"></canvas>
 
                     <!-- YouTube Iframe Embed Container -->
                     <div id="yt-player-container" class="absolute inset-0 w-full h-full hidden z-10">
@@ -310,7 +310,7 @@
                         </span>
                         <span class="font-mono text-cyan-400">96 BPM • OUTRUN SYNTH</span>
                     </div>
-                    <canvas id="audio-visualizer-canvas" height="36" class="w-full h-9 rounded-xl bg-slate-950 border border-slate-800/80 shadow-inner"></canvas>
+                    <canvas id="audio-visualizer-canvas" width="600" height="36" class="w-full h-9 rounded-xl bg-slate-950 border border-slate-800/80 shadow-inner"></canvas>
                 </div>
             </div>
 
@@ -568,7 +568,7 @@
             </div>
 
             <div class="flex justify-end pt-2 border-t border-slate-800">
-                <button onclick="window.gtaApp.toggleModal('copyright', false)" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition">
+                <button id="btn-confirm-copyright-close" onclick="window.gtaApp && window.gtaApp.toggleModal('copyright', false)" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition">
                     Got It, Close
                 </button>
             </div>
@@ -618,7 +618,7 @@
             </div>
 
             <div class="flex justify-end pt-2 border-t border-slate-800">
-                <button onclick="window.gtaApp.toggleModal('obs', false)" class="px-4 py-2 rounded-lg bg-pink-600 hover:bg-pink-500 text-white font-bold text-xs uppercase tracking-wider transition">
+                <button id="btn-confirm-obs-close" onclick="window.gtaApp && window.gtaApp.toggleModal('obs', false)" class="px-4 py-2 rounded-lg bg-pink-600 hover:bg-pink-500 text-white font-bold text-xs uppercase tracking-wider transition">
                     Done
                 </button>
             </div>

@@ -6,26 +6,45 @@
 
 class ViceCityVisualsEngine {
     constructor(canvasId) {
-        this.canvas = document.getElementById(canvasId);
+        this.canvasId = canvasId || 'non-copyright-canvas';
+        this.canvas = document.getElementById(this.canvasId);
         this.ctx = this.canvas ? this.canvas.getContext('2d') : null;
         this.isRunning = false;
         this.speed = 1.0;
         this.gridOffset = 0;
         this.stars = [];
         this.time = 0;
+        this.animationFrameId = null;
         
         if (this.canvas) {
             this.resize();
             window.addEventListener('resize', () => this.resize());
-            this.initStars();
         }
+        this.initStars();
     }
 
     resize() {
+        if (!this.canvas && this.canvasId) {
+            this.canvas = document.getElementById(this.canvasId);
+            if (this.canvas) this.ctx = this.canvas.getContext('2d');
+        }
         if (!this.canvas) return;
+
         const rect = this.canvas.getBoundingClientRect();
-        this.canvas.width = rect.width * (window.devicePixelRatio || 1);
-        this.canvas.height = rect.height * (window.devicePixelRatio || 1);
+        const parent = this.canvas.parentElement;
+        const parentW = parent ? parent.clientWidth : 0;
+        const parentH = parent ? parent.clientHeight : 0;
+
+        const w = (rect.width > 50 ? rect.width : (parentW > 50 ? parentW : 1280));
+        const h = (rect.height > 50 ? rect.height : (parentH > 50 ? parentH : 720));
+
+        const targetW = Math.floor(w * (window.devicePixelRatio || 1));
+        const targetH = Math.floor(h * (window.devicePixelRatio || 1));
+
+        if (this.canvas.width !== targetW || this.canvas.height !== targetH) {
+            this.canvas.width = targetW;
+            this.canvas.height = targetH;
+        }
     }
 
     initStars() {
@@ -41,6 +60,13 @@ class ViceCityVisualsEngine {
     }
 
     start() {
+        if (!this.canvas && this.canvasId) {
+            this.canvas = document.getElementById(this.canvasId);
+            if (this.canvas) {
+                this.ctx = this.canvas.getContext('2d');
+                window.addEventListener('resize', () => this.resize());
+            }
+        }
         if (this.isRunning) return;
         this.isRunning = true;
         this.resize();
@@ -49,19 +75,30 @@ class ViceCityVisualsEngine {
 
     stop() {
         this.isRunning = false;
+        if (this.animationFrameId) {
+            cancelAnimationFrame(this.animationFrameId);
+            this.animationFrameId = null;
+        }
     }
 
     loop() {
         if (!this.isRunning || !this.ctx) return;
         this.render();
         this.time += 0.02;
-        requestAnimationFrame(() => this.loop());
+        this.animationFrameId = requestAnimationFrame(() => this.loop());
     }
 
     render() {
+        if (!this.ctx || !this.canvas) return;
+
+        // Auto-recover if canvas dimensions are zero or unrendered
+        if (this.canvas.width < 100 || this.canvas.height < 100) {
+            this.resize();
+        }
+
         const ctx = this.ctx;
-        const w = this.canvas.width;
-        const h = this.canvas.height;
+        const w = Math.max(300, this.canvas.width);
+        const h = Math.max(150, this.canvas.height);
         const horizonY = h * 0.58;
 
         // 1. SKY: Midnight violet to neon magenta/orange gradient
@@ -281,4 +318,23 @@ class ViceCityVisualsEngine {
 }
 
 window.ViceCityVisualsEngine = ViceCityVisualsEngine;
+
+// Self-starting immediate fallback so canvas is instantly active
+(function() {
+    function initVisuals() {
+        if (!window.gtaVisuals) {
+            const canvas = document.getElementById("non-copyright-canvas");
+            if (canvas) {
+                window.gtaVisuals = new ViceCityVisualsEngine("non-copyright-canvas");
+                window.gtaVisuals.start();
+            }
+        }
+    }
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initVisuals);
+    } else {
+        initVisuals();
+    }
+    window.addEventListener("load", initVisuals);
+})();
 

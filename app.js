@@ -77,7 +77,7 @@ const COUNTRIES = [
 class GTAStreamApp {
     constructor() {
         this.config = this.loadConfig();
-        this.synth = new window.SynthwaveAudioEngine();
+        this.synth = window.SynthwaveAudioEngine ? new window.SynthwaveAudioEngine() : null;
         this.ytPlayer = null;
         this.searchQuery = "";
         this.activeFilter = "all"; // 'all', 'pinned'
@@ -110,7 +110,14 @@ class GTAStreamApp {
         let conf = { ...DEFAULT_CONFIG };
         try {
             const saved = localStorage.getItem("gta6_overlay_config");
-            if (saved) conf = { ...conf, ...JSON.parse(saved) };
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                // Validate parsed date
+                if (parsed.targetLaunchDate && isNaN(new Date(parsed.targetLaunchDate).getTime())) {
+                    delete parsed.targetLaunchDate;
+                }
+                conf = { ...conf, ...parsed };
+            }
         } catch (e) {}
 
         // URL Query Parameters support for OBS Studio & Vercel
@@ -135,12 +142,19 @@ class GTAStreamApp {
     }
 
     saveConfig() {
-        localStorage.setItem("gta6_overlay_config", JSON.stringify(this.config));
+        try {
+            localStorage.setItem("gta6_overlay_config", JSON.stringify(this.config));
+        } catch (e) {}
     }
 
     calculatePredownloadDate() {
-        const launch = new Date(this.config.targetLaunchDate).getTime();
-        const predownloadMs = this.config.predownloadLeadHours * 60 * 60 * 1000;
+        let launch = new Date(this.config.targetLaunchDate).getTime();
+        if (isNaN(launch)) {
+            this.config.targetLaunchDate = DEFAULT_CONFIG.targetLaunchDate;
+            launch = new Date(DEFAULT_CONFIG.targetLaunchDate).getTime();
+        }
+        const leadHours = parseInt(this.config.predownloadLeadHours, 10) || 48;
+        const predownloadMs = leadHours * 60 * 60 * 1000;
         return new Date(launch - predownloadMs);
     }
 
@@ -202,8 +216,16 @@ class GTAStreamApp {
         if (this.dom.inputLeadHours) this.dom.inputLeadHours.value = this.config.predownloadLeadHours;
         if (this.dom.inputCrtToggle) this.dom.inputCrtToggle.checked = this.config.crtEffect;
 
-        const dateIsoLocal = new Date(this.config.targetLaunchDate).toISOString().slice(0, 16);
-        if (this.dom.inputTargetDate) this.dom.inputTargetDate.value = dateIsoLocal;
+        try {
+            const dateIsoLocal = new Date(this.config.targetLaunchDate).toISOString().slice(0, 16);
+            if (this.dom.inputTargetDate) this.dom.inputTargetDate.value = dateIsoLocal;
+        } catch (e) {
+            if (this.dom.inputTargetDate) this.dom.inputTargetDate.value = "2026-11-20T00:00";
+        }
+
+        if (this.dom.targetDateLabel && this.predownloadTargetDate) {
+            this.dom.targetDateLabel.textContent = this.predownloadTargetDate.toUTCString();
+        }
 
         this.applyCrtEffect(this.config.crtEffect);
         this.applyObsMode(this.config.obsMode);
@@ -264,6 +286,52 @@ class GTAStreamApp {
 
         document.getElementById("btn-open-obs-guide")?.addEventListener("click", () => this.toggleModal("obs", true));
         document.getElementById("btn-close-obs-guide")?.addEventListener("click", () => this.toggleModal("obs", false));
+
+        // Copy Stream Kit template for YouTube Studio
+        document.getElementById("btn-copy-stream-kit")?.addEventListener("click", () => {
+            const template = `Grand Theft Auto VI - Official World Pre-Download & Launch Countdown [4K 60FPS]
+
+🎮 Welcome to the live GTA VI Pre-Download & Global Release Countdown stream!
+Tracking real-time launch and pre-download unlock times across 39 worldwide timezones.
+
+📅 Target Release: Fall 2026 (PS5 / Xbox Series X|S)
+⏳ Pre-Download Window: 48h - 72h Prior to Global Launch
+
+🛡️ YOUTUBE STREAM COMPLIANCE & FAIR-USE NOTICE:
+- Background audio: 100% royalty-free, original procedural 80s outrun synthwave generated in real-time. No commercial copyright audio is broadcast.
+- Visuals: Procedural 4K Vice City retro-animated synthwave canvas engine.
+- GTA VI and all related logos and trademarks are property of Rockstar Games and Take-Two Interactive Software, Inc. Displayed for news reporting, commentary, and public countdown tracking under Fair Use principles.
+
+#GTAVI #GTA6 #RockstarGames #ViceCity #Countdown #GamingLive`;
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(template).then(() => {
+                    const btn = document.getElementById("btn-copy-stream-kit");
+                    if (btn) {
+                        const original = btn.textContent;
+                        btn.textContent = "Copied to Clipboard! ✓";
+                        btn.classList.add("bg-emerald-600");
+                        btn.classList.remove("bg-pink-600");
+                        setTimeout(() => {
+                            btn.textContent = original;
+                            btn.classList.remove("bg-emerald-600");
+                            btn.classList.add("bg-pink-600");
+                        }, 2500);
+                    }
+                }).catch(() => {
+                    alert("Stream Template copied!");
+                });
+            }
+        });
+
+        // Modal backdrop click to close
+        [this.dom.settingsModal, this.dom.copyrightModal, this.dom.obsModal].forEach(modal => {
+            if (modal) {
+                modal.addEventListener("click", (e) => {
+                    if (e.target === modal) modal.classList.add("hidden");
+                });
+            }
+        });
 
         // Toggle OBS Mode
         document.getElementById("btn-toggle-obs")?.addEventListener("click", () => this.toggleObsMode());
@@ -417,20 +485,35 @@ class GTAStreamApp {
         const localVideo = this.dom.localVideoPlayer;
 
         if (mode === "non-copyright") {
-            if (canvas) canvas.classList.remove("hidden");
+            if (canvas) {
+                canvas.classList.remove("hidden");
+                canvas.style.display = "block";
+            }
             if (ytContainer) ytContainer.classList.add("hidden");
             if (localVideo) localVideo.classList.add("hidden");
 
             if (this.ytPlayer && this.ytPlayer.pauseVideo) {
                 try { this.ytPlayer.pauseVideo(); } catch (e) {}
             }
-            if (this.visualsEngine) this.visualsEngine.start();
+            if (this.visualsEngine) {
+                this.visualsEngine.start();
+            } else if (window.gtaVisuals) {
+                this.visualsEngine = window.gtaVisuals;
+                this.visualsEngine.start();
+            } else if (window.ViceCityVisualsEngine) {
+                this.visualsEngine = new window.ViceCityVisualsEngine("non-copyright-canvas");
+                this.visualsEngine.start();
+            }
+
             if (this.dom.videoSourceBadge) {
                 this.dom.videoSourceBadge.textContent = "🛡️ Non-Copyright 4K Loop";
                 this.dom.videoSourceBadge.className = "font-mono text-emerald-300 font-black text-xs sm:text-sm bg-emerald-950/90 px-3 py-1 rounded-md border border-emerald-500/50 shadow-sm";
             }
         } else if (mode === "youtube") {
-            if (canvas) canvas.classList.add("hidden");
+            if (canvas) {
+                canvas.classList.add("hidden");
+                canvas.style.display = "none";
+            }
             if (ytContainer) ytContainer.classList.remove("hidden");
             if (localVideo) localVideo.classList.add("hidden");
 
@@ -450,7 +533,10 @@ class GTAStreamApp {
                 this.ytPlayer.playVideo();
             }
         } else if (mode === "local") {
-            if (canvas) canvas.classList.add("hidden");
+            if (canvas) {
+                canvas.classList.add("hidden");
+                canvas.style.display = "none";
+            }
             if (ytContainer) ytContainer.classList.add("hidden");
             if (localVideo) localVideo.classList.remove("hidden");
 
@@ -458,6 +544,31 @@ class GTAStreamApp {
             if (this.ytPlayer && this.ytPlayer.pauseVideo) {
                 try { this.ytPlayer.pauseVideo(); } catch (e) {}
             }
+        }
+
+        this.updateTrailerButtonStyles(mode);
+    }
+
+    updateTrailerButtonStyles(activeMode) {
+        const btnNc = document.getElementById("btn-non-copyright-visuals");
+        const btnT1 = document.getElementById("btn-trailer-1");
+        const btnCustom = document.getElementById("btn-trailer-custom");
+        const btnLocal = document.getElementById("btn-local-file");
+
+        [btnNc, btnT1, btnCustom, btnLocal].forEach(b => {
+            if (b) {
+                b.className = "px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 transition flex items-center gap-1.5";
+            }
+        });
+
+        if (activeMode === "non-copyright" && btnNc) {
+            btnNc.className = "px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs font-black text-white shadow-md shadow-emerald-900 transition flex items-center gap-1.5";
+        } else if (activeMode === "youtube" && btnT1 && this.config.youtubeVideoId === DEFAULT_CONFIG.youtubeVideoId) {
+            btnT1.className = "px-3 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-xs font-black text-white shadow-md shadow-cyan-900 transition flex items-center gap-1.5";
+        } else if (activeMode === "youtube" && btnCustom) {
+            btnCustom.className = "px-3 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-xs font-black text-white shadow-md shadow-cyan-900 transition flex items-center gap-1.5";
+        } else if (activeMode === "local" && btnLocal) {
+            btnLocal.className = "px-3 py-1.5 rounded-lg bg-pink-600 hover:bg-pink-500 text-xs font-black text-white shadow-md shadow-pink-900 transition flex items-center gap-1.5";
         }
     }
 
@@ -739,8 +850,10 @@ class GTAStreamApp {
         };
 
         renderCardGroup(false);
-        renderCardGroup(true); // Duplicate set for infinite seamless wrap
-    }
+        // Only duplicate for seamless infinite scroll when showing all countries
+        if (!this.searchQuery && this.activeFilter === "all" && filtered.length > 2) {
+            renderCardGroup(true);
+        }
     }
 
     startCountdownLoop() {
@@ -757,7 +870,7 @@ class GTAStreamApp {
                 isPreDownloadActive = true;
             }
 
-            if (diff < 0) diff = 0;
+            if (isNaN(diff) || diff < 0) diff = 0;
 
             const days = Math.floor(diff / (1000 * 60 * 60 * 24));
             const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -774,10 +887,10 @@ class GTAStreamApp {
             if (this.dom.targetTypeBadge) {
                 if (isPreDownloadActive) {
                     this.dom.targetTypeBadge.textContent = "PRE-DOWNLOAD LIVE | COUNTDOWN TO UNLOCK";
-                    this.dom.targetTypeBadge.className = "px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 animate-pulse";
+                    this.dom.targetTypeBadge.className = "px-2.5 py-1 rounded text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 animate-pulse";
                 } else {
                     this.dom.targetTypeBadge.textContent = `PRE-DOWNLOAD OPENS (${this.config.predownloadLeadHours}h PRIOR)`;
-                    this.dom.targetTypeBadge.className = "px-2 py-0.5 rounded text-[11px] font-bold bg-pink-500/20 text-pink-300 border border-pink-500/40";
+                    this.dom.targetTypeBadge.className = "px-2.5 py-1 rounded text-xs font-bold bg-pink-500/20 text-pink-300 border border-pink-500/40";
                 }
             }
 
@@ -794,7 +907,8 @@ class GTAStreamApp {
             requestAnimationFrame(updateTick);
         };
 
-        requestAnimationFrame(updateTick);
+        // Run synchronously once so UI updates instantly
+        updateTick();
     }
 
     updateCountryClocks() {
@@ -823,24 +937,26 @@ class GTAStreamApp {
         const ctx = canvas.getContext("2d");
 
         const render = () => {
-            const freqData = this.synth ? this.synth.getFrequencyData() : new Uint8Array(0);
+            const freqData = (this.synth && this.synth.isPlaying) ? this.synth.getFrequencyData() : null;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            const barCount = 32;
+            const barCount = 36;
             const barWidth = canvas.width / barCount;
             const now = Date.now();
 
             for (let i = 0; i < barCount; i++) {
                 let val = 0;
-                if (this.synth && this.synth.isPlaying && freqData.length > 0) {
-                    val = freqData[i % freqData.length] / 255;
-                } else {
-                    val = 0.08 + Math.sin(now / 400 + i * 0.35) * 0.04;
+                if (freqData && freqData.length > 0) {
+                    val = (freqData[i % freqData.length] || 0) / 255;
                 }
-                const barHeight = Math.max(2, val * (canvas.height - 4));
+                if (val < 0.08) {
+                    val = 0.12 + Math.sin(now / 350 + i * 0.28) * 0.07;
+                }
+                const barHeight = Math.max(3, val * (canvas.height - 4));
 
                 const grad = ctx.createLinearGradient(0, canvas.height, 0, 0);
                 grad.addColorStop(0, '#ff2a85');
+                grad.addColorStop(0.5, '#bd24df');
                 grad.addColorStop(1, '#00f0ff');
 
                 ctx.fillStyle = grad;
@@ -864,12 +980,21 @@ class GTAStreamApp {
         const step = () => {
             if (this.autoScrollEnabled && !this.isUserHovering && this.dom.countryGrid) {
                 const grid = this.dom.countryGrid;
-                grid.scrollTop += this.autoScrollSpeed;
+                if (grid.scrollHeight > grid.clientHeight) {
+                    grid.scrollTop += this.autoScrollSpeed;
 
-                // Infinite seamless loop: wrap around when past the midpoint of duplicated cards
-                const halfHeight = grid.scrollHeight / 2;
-                if (halfHeight > 50 && grid.scrollTop >= halfHeight) {
-                    grid.scrollTop -= halfHeight;
+                    // If cards are duplicated (no search or region filter active)
+                    if (!this.searchQuery && this.activeFilter === "all") {
+                        const halfHeight = grid.scrollHeight / 2;
+                        if (halfHeight > 50 && grid.scrollTop >= halfHeight) {
+                            grid.scrollTop -= halfHeight;
+                        }
+                    } else {
+                        // Standard continuous loop when filtered
+                        if (grid.scrollTop + grid.clientHeight >= grid.scrollHeight - 2) {
+                            grid.scrollTop = 0;
+                        }
+                    }
                 }
             }
             requestAnimationFrame(step);
@@ -878,8 +1003,21 @@ class GTAStreamApp {
     }
 }
 
-// Instantiate on document load
-document.addEventListener("DOMContentLoaded", () => {
-    window.gtaApp = new GTAStreamApp();
-});
+// Multi-stage safe bootloader: loads immediately under any document state
+function bootGTAApp() {
+    if (!window.gtaApp) {
+        try {
+            window.gtaApp = new GTAStreamApp();
+        } catch (e) {
+            console.error("Critical error starting GTA VI Overlay App:", e);
+        }
+    }
+}
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", bootGTAApp);
+} else {
+    bootGTAApp();
+}
+window.addEventListener("load", bootGTAApp);
 

@@ -47,8 +47,15 @@ class SynthwaveAudioEngine {
             this.masterGain.connect(this.analyser);
             this.analyser.connect(this.ctx.destination);
         }
-        if (this.ctx.state === 'suspended') {
-            this.ctx.resume();
+        if (this.ctx && this.ctx.state === 'suspended') {
+            this.ctx.resume().catch(() => {});
+            const unlockAudio = () => {
+                if (this.ctx && this.ctx.state === 'suspended') {
+                    this.ctx.resume().catch(() => {});
+                }
+            };
+            document.addEventListener('click', unlockAudio, { once: true });
+            document.addEventListener('keydown', unlockAudio, { once: true });
         }
     }
 
