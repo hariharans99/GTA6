@@ -1,0 +1,20 @@
+{
+  "name": "gta-6-countdown-stream-overlay",
+  "version": "1.0.0",
+  "description": "GTA VI Trailer & Global Pre-Download Countdown OBS Stream Overlay with YouTube Copyright Protection",
+  "main": "index.html",
+  "scripts": {
+    "start": "start index.html"
+  },
+  "keywords": [
+    "gta6",
+    "grand-theft-auto",
+    "obs-overlay",
+    "countdown",
+    "youtube-stream",
+    "stream-overlay"
+  ],
+  "author": "",
+  "license": "MIT"
+}
+

@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GTA VI Trailer & Global Pre-Download Countdown | YouTube Stream Overlay</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        vice: {
+                            pink: '#ff2a85',
+                            cyan: '#00f0ff',
+                            purple: '#7928ca',
+                            dark: '#070913',
+                            panel: '#0d1127'
+                        }
+                    },
+                    fontFamily: {
+                        orbitron: ['Orbitron', 'sans-serif'],
+                        bebas: ['"Bebas Neue"', 'sans-serif'],
+                        montserrat: ['Montserrat', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;600;700;800;900&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* Custom Vice City Aesthetic Styling */
+        body {
+            background-color: #070913;
+            color: #f1f5f9;
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden;
+            user-select: none;
+        }
+
+        .neon-glow-pink {
+            text-shadow: 0 0 10px rgba(255, 42, 133, 0.7), 0 0 20px rgba(255, 42, 133, 0.4);
+        }
+
+        .neon-glow-cyan {
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.7), 0 0 20px rgba(0, 240, 255, 0.4);
+        }
+
+        .border-glow-pink {
+            box-shadow: 0 0 15px rgba(255, 42, 133, 0.35);
+        }
+
+        .border-glow-cyan {
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.35);
+        }
+
+        /* Retro CRT Scanlines Effect */
+        .crt-scanlines {
+            background: linear-gradient(
+                rgba(18, 16, 16, 0) 50%, 
+                rgba(0, 0, 0, 0.35) 50%
+            ), linear-gradient(
+                90deg,
+                rgba(255, 0, 0, 0.03),
+                rgba(0, 255, 0, 0.01),
+                rgba(0, 0, 255, 0.03)
+            );
+            background-size: 100% 4px, 6px 100%;
+            pointer-events: none;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0d1127;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #ff2a85;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00f0ff;
+        }
+
+        /* OBS Clean Canvas Mode Override */
+        body.obs-clean-canvas {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: #070913;
+        }
+        body.obs-clean-canvas #top-nav,
+        body.obs-clean-canvas .hide-on-obs {
+            display: none !important;
+        }
+        body.obs-clean-canvas #main-content-layout {
+            height: calc(100vh - 44px);
+        }
+
+        /* Animated gradient border */
+        @keyframes border-dance {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .animated-gradient-border {
+            background: linear-gradient(90deg, #ff2a85, #7928ca, #00f0ff, #ff2a85);
+            background-size: 300% 300%;
+            animation: border-dance 6s ease infinite;
+        }
+
+        /* Marquee ticker animation */
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        .animate-marquee {
+            display: inline-block;
+            white-space: nowrap;
+            animation: marquee 28s linear infinite;
+        }
+        .animate-marquee:hover {
+            animation-play-state: paused;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-pink-600 selection:text-white">
+
+    <!-- CRT Scanlines Overlay -->
+    <div id="crt-overlay" class="crt-scanlines fixed inset-0 z-40 pointer-events-none"></div>
+
+    <!-- Hidden Local File Input -->
+    <input type="file" id="local-file-input" accept="video/mp4,video/webm,video/ogg" class="hidden">
+
+    <!-- TOP CONTROL NAVIGATION BAR (Setup & Streamer Controls) -->
+    <nav id="top-nav" class="bg-slate-950/90 border-b border-slate-800 backdrop-blur-md px-4 py-2 flex flex-wrap items-center justify-between z-30 sticky top-0 shadow-lg">
+        <!-- Logo & Title -->
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-pink-600 to-cyan-400 flex items-center justify-center font-bebas text-2xl text-white shadow-md shadow-pink-600/40">
+                VI
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <span class="font-bebas tracking-wider text-xl text-white">GTA <span class="text-pink-500 neon-glow-pink">VI</span> STREAM OVERLAY</span>
+                    <span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-pink-950 text-pink-300 border border-pink-700/50">LIVE OBS 1080P</span>
+                </div>
+                <div class="text-[11px] text-slate-400">Pre-Download World Clock & YouTube Copyright Protection System</div>
+            </div>
+        </div>
+
+        <!-- Center: Quick Copyright Safety Status -->
+        <div class="flex items-center gap-3">
+            <div id="copyright-status-badge" class="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase bg-emerald-950 text-emerald-400 border border-emerald-500/40">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> SAFE FOR YOUTUBE (Synthwave BGM)
+            </div>
+            <button id="btn-open-copyright" class="text-xs text-cyan-400 hover:text-cyan-300 underline font-semibold transition" title="View YouTube Copyright Rules">
+                Copyright Rules & Guide
+            </button>
+        </div>
+
+        <!-- Right: Action Buttons -->
+        <div class="flex items-center gap-2">
+            <button id="btn-toggle-obs" class="px-3 py-1.5 rounded-lg bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-xs font-bold uppercase tracking-wider text-white shadow-md shadow-pink-600/30 transition flex items-center gap-1.5" title="Switch to Full Clean Canvas for OBS Capture (Hotkey: O)">
+                <span>🎥</span> Clean OBS Mode (O)
+            </button>
+            <button id="btn-open-settings" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 border border-slate-700 transition flex items-center gap-1.5">
+                <span>⚙️</span> Settings
+            </button>
+            <button id="btn-open-obs-guide" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-bold text-cyan-400 border border-slate-700 transition flex items-center gap-1.5">
+                <span>📘</span> OBS Setup
+            </button>
+        </div>
+    </nav>
+
+    <!-- OBS MODE EXIT FLOATING BADGE (Visible only in OBS Mode on hover) -->
+    <div id="obs-mode-banner" class="hidden fixed top-2 right-2 z-50 group">
+        <button id="btn-exit-obs" class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 px-3 py-1.5 rounded-lg bg-slate-900/90 text-xs text-pink-400 border border-pink-500/50 backdrop-blur shadow-lg">
+            Exit OBS Clean Mode (Press O)
+        </button>
+    </div>
+
+    <!-- MAIN INTERACTIVE STREAM WORKSPACE (16:9 SPLIT) -->
+    <main id="main-content-layout" class="flex-1 w-full max-w-[1920px] mx-auto p-3 lg:p-4 grid grid-cols-1 lg:grid-cols-12 gap-4">
+        
+        <!-- LEFT / MAIN PANE: GTA VI TRAILER PLAYER & AUDIO CONTROLS (Cols 1 to 7/8) -->
+        <section class="lg:col-span-7 xl:col-span-8 flex flex-col gap-3">
+            
+            <!-- VIDEO CONTAINER WITH NEON FRAME -->
+            <div class="relative w-full rounded-2xl p-[2px] animated-gradient-border shadow-2xl overflow-hidden flex flex-col bg-slate-950">
+                
+                <!-- Trailer Top Status Bar -->
+                <div class="bg-slate-950/95 px-4 py-2.5 border-b border-slate-800 flex flex-wrap items-center justify-between text-xs gap-2 z-10">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-3 h-3 rounded-full bg-emerald-400 animate-ping"></span>
+                        <span class="font-bebas tracking-wider text-lg text-white">NOW PLAYING:</span>
+                        <span id="video-source-badge" class="font-mono text-emerald-300 font-black text-xs sm:text-sm bg-emerald-950/90 px-3 py-1 rounded-md border border-emerald-500/50 shadow-sm">🛡️ Non-Copyright 4K Loop</span>
+                    </div>
+
+                    <!-- Trailer Switcher Buttons -->
+                    <div class="flex items-center gap-2 hide-on-obs">
+                        <button id="btn-non-copyright-visuals" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs font-black text-white shadow-md shadow-emerald-900 transition flex items-center gap-1.5">
+                            <span>🛡️</span> Non-Copyright 4K Loop
+                        </button>
+                        <button id="btn-trailer-1" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 transition flex items-center gap-1.5">
+                            <span>🎬</span> Official Trailer 1
+                        </button>
+                        <button id="btn-trailer-custom" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-bold text-cyan-400 transition">
+                            Paste URL
+                        </button>
+                        <button id="btn-local-file" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-bold text-pink-400 transition flex items-center gap-1.5">
+                            <span>📁</span> Load MP4
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 16:9 Aspect Video Player Viewport -->
+                <div class="relative w-full pb-[56.25%] bg-black overflow-hidden group">
+                    
+                    <!-- 100% Non-Copyright Procedural 60FPS Vice City 4K Animated Canvas -->
+                    <canvas id="non-copyright-canvas" class="absolute inset-0 w-full h-full object-cover z-0"></canvas>
+
+                    <!-- YouTube Iframe Embed Container -->
+                    <div id="yt-player-container" class="absolute inset-0 w-full h-full hidden z-10">
+                        <div id="yt-player" class="w-full h-full pointer-events-none"></div>
+                    </div>
+
+                    <!-- Local MP4 Video Fallback -->
+                    <video id="local-video-player" class="absolute inset-0 w-full h-full object-cover hidden z-10" playsinline></video>
+
+                    <!-- Watermark Logo Overlay in Video Corner -->
+                    <div class="absolute bottom-4 left-4 z-20 pointer-events-none flex items-center gap-2 bg-black/75 backdrop-blur-md px-3.5 py-1.5 rounded-lg border border-white/20 shadow-xl">
+                        <span class="font-bebas text-2xl text-white tracking-wider">GRAND THEFT AUTO <span class="text-pink-500">VI</span></span>
+                        <span class="text-xs font-mono font-black px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-700">4K 60FPS</span>
+                    </div>
+                </div>
+
+                <!-- Copyright Hazard Banner (Visible when Original Audio with Tom Petty is chosen) -->
+                <div id="copyright-banner" class="hidden bg-rose-950/90 border-t border-rose-500/60 p-3 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-rose-200 z-10">
+                    <div class="flex items-center gap-2.5">
+                        <span class="text-xl">⚠️</span>
+                        <div>
+                            <div class="font-bold text-white text-sm">YOUTUBE COPYRIGHT ALERT: ORIGINAL AUDIO ACTIVE</div>
+                            <div class="text-rose-300 text-[11px]">Contains <em>"Love Is a Long Road"</em> by Tom Petty (UMG). YouTube Content ID will flag or mute live stream audio.</div>
+                        </div>
+                    </div>
+                    <button class="btn-make-safe px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold tracking-wide transition shadow-md shadow-emerald-900 flex items-center gap-1.5 whitespace-nowrap">
+                        <span>🛡️</span> Switch to Stream-Safe Audio
+                    </button>
+                </div>
+            </div>
+
+            <!-- AUDIO & STREAM SAFETY CONTROL DECK -->
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 backdrop-blur-md shadow-lg flex flex-col gap-3">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-2.5">
+                    <div class="flex items-center gap-2">
+                        <span class="text-lg">🎧</span>
+                        <span class="font-bold text-white text-sm tracking-wide">YOUTUBE AUDIO CONTROLLER</span>
+                        <span class="text-[11px] text-slate-400 font-sans">(Hotkeys: Press <kbd class="px-1.5 py-0.5 bg-slate-800 rounded text-pink-400 font-mono">S</kbd> to toggle safe audio)</span>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <label for="audio-mode-select" class="text-xs text-slate-400">Audio Mode:</label>
+                        <select id="audio-mode-select" class="bg-slate-950 border border-slate-700 text-xs font-semibold text-cyan-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-pink-500">
+                            <option value="safe-synth">🟢 Stream-Safe (80s Synthwave BGM)</option>
+                            <option value="silent">🟢 Streamer Mic Only (All Muted)</option>
+                            <option value="original">🔴 Original Audio (Tom Petty - Caution)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Volume & Audio Controls Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+                    <!-- Synthwave BGM Volume Slider -->
+                    <div class="flex items-center gap-3 bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">
+                        <span class="text-sm">🎹</span>
+                        <div class="flex-1">
+                            <div class="flex justify-between text-xs text-slate-400 mb-1">
+                                <span class="font-medium text-slate-300">Synthwave BGM Volume</span>
+                                <span id="synth-volume-value" class="font-mono text-cyan-300">45%</span>
+                            </div>
+                            <input id="synth-volume-slider" type="range" min="0" max="100" value="45" class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-400">
+                        </div>
+                    </div>
+
+                    <!-- Quick Copyright Summary Card -->
+                    <div class="flex items-center justify-between bg-slate-950/60 p-2.5 rounded-xl border border-slate-800 text-xs">
+                        <div>
+                            <div class="font-bold text-slate-300">Content ID Protection</div>
+                            <div class="text-[11px] text-emerald-400 flex items-center gap-1 mt-0.5">
+                                <span>✔</span> Procedural synthesized audio (0% claim risk)
+                            </div>
+                        </div>
+                        <button id="btn-trigger-copyright-help" onclick="window.gtaApp.toggleModal('copyright', true)" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 text-[11px] transition">
+                            Details
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Live Neon Audio Visualizer Canvas -->
+                <div class="pt-1">
+                    <div class="flex items-center justify-between text-[10px] text-slate-400 mb-1 px-1">
+                        <span class="flex items-center gap-1 font-mono uppercase text-pink-400">
+                            <span class="w-1.5 h-1.5 rounded-full bg-pink-500 animate-ping"></span> Live Audio Waveform (Stream-Safe Synth)
+                        </span>
+                        <span class="font-mono text-cyan-400">96 BPM • OUTRUN SYNTH</span>
+                    </div>
+                    <canvas id="audio-visualizer-canvas" height="36" class="w-full h-9 rounded-xl bg-slate-950 border border-slate-800/80 shadow-inner"></canvas>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- RIGHT PANE: MASTER COUNTDOWN & COUNTRY TIMEZONE LIST (Cols 8 to 12) -->
+        <section class="lg:col-span-5 xl:col-span-4 flex flex-col gap-3">
+            
+            <!-- MASTER COUNTDOWN CARD -->
+            <div class="bg-gradient-to-b from-slate-900 to-slate-950 border border-pink-500/30 rounded-2xl p-4 shadow-xl border-glow-pink flex flex-col gap-3 relative overflow-hidden">
+                <!-- Ambient Glow -->
+                <div class="absolute -top-12 -right-12 w-32 h-32 bg-pink-600/20 rounded-full blur-3xl pointer-events-none"></div>
+
+                <!-- Card Header -->
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-pink-500 animate-pulse"></span>
+                        <span class="font-bebas text-xl tracking-wider text-white">GLOBAL PRE-DOWNLOAD COUNTDOWN</span>
+                    </div>
+                    <span id="target-type-badge" class="px-2.5 py-1 rounded text-xs font-black bg-pink-500/20 text-pink-300 border border-pink-500/50">
+                        PRE-DOWNLOAD OPENS (48h PRIOR)
+                    </span>
+                </div>
+
+                <!-- DIGITAL COUNTDOWN READOUT (ENLARGED & ULTRA-LEGIBLE FOR STREAM) -->
+                <div class="grid grid-cols-5 gap-2 text-center my-1.5">
+                    <!-- Days -->
+                    <div class="bg-slate-950/95 border-2 border-pink-500/60 rounded-xl p-2.5 sm:p-3 flex flex-col justify-center shadow-lg">
+                        <div id="master-days" class="font-orbitron text-3xl sm:text-4xl lg:text-5xl font-black text-pink-500 neon-glow-pink">00</div>
+                        <div class="text-xs sm:text-sm font-black text-slate-200 uppercase tracking-widest mt-1">Days</div>
+                    </div>
+                    <!-- Hours -->
+                    <div class="bg-slate-950/95 border-2 border-cyan-400/60 rounded-xl p-2.5 sm:p-3 flex flex-col justify-center shadow-lg">
+                        <div id="master-hours" class="font-orbitron text-3xl sm:text-4xl lg:text-5xl font-black text-cyan-400 neon-glow-cyan">00</div>
+                        <div class="text-xs sm:text-sm font-black text-slate-200 uppercase tracking-widest mt-1">Hours</div>
+                    </div>
+                    <!-- Mins -->
+                    <div class="bg-slate-950/95 border-2 border-slate-700 rounded-xl p-2.5 sm:p-3 flex flex-col justify-center shadow-lg">
+                        <div id="master-mins" class="font-orbitron text-3xl sm:text-4xl lg:text-5xl font-black text-white">00</div>
+                        <div class="text-xs sm:text-sm font-black text-slate-200 uppercase tracking-widest mt-1">Mins</div>
+                    </div>
+                    <!-- Secs -->
+                    <div class="bg-slate-950/95 border-2 border-pink-500/50 rounded-xl p-2.5 sm:p-3 flex flex-col justify-center shadow-lg">
+                        <div id="master-secs" class="font-orbitron text-3xl sm:text-4xl lg:text-5xl font-black text-pink-400">00</div>
+                        <div class="text-xs sm:text-sm font-black text-slate-200 uppercase tracking-widest mt-1">Secs</div>
+                    </div>
+                    <!-- Milliseconds -->
+                    <div class="bg-slate-950/95 border-2 border-amber-500/60 rounded-xl p-2.5 sm:p-3 flex flex-col justify-center shadow-lg">
+                        <div id="master-millis" class="font-orbitron text-3xl sm:text-4xl lg:text-5xl font-black text-yellow-300 font-mono">00</div>
+                        <div class="text-xs sm:text-sm font-black text-slate-200 uppercase tracking-widest mt-1">MS</div>
+                    </div>
+                </div>
+
+                <!-- Sub-info: Target Launch Anchor -->
+                <div class="flex items-center justify-between text-xs sm:text-sm text-slate-300 border-t border-slate-800/80 pt-2 font-mono font-bold">
+                    <span>TARGET UTC:</span>
+                    <span id="target-date-label" class="text-cyan-300 font-bold truncate">Loading Target...</span>
+                </div>
+
+                <!-- Platform Pre-Load Presets -->
+                <div class="flex items-center gap-2 pt-1.5 border-t border-slate-800/60">
+                    <span class="text-xs uppercase font-black text-slate-400">Platform:</span>
+                    <button id="platform-ps5" class="platform-btn px-2.5 py-1 rounded-md text-xs font-black bg-pink-600 text-white transition shadow-sm">
+                        PS5 (48h)
+                    </button>
+                    <button id="platform-xbox" class="platform-btn px-2.5 py-1 rounded-md text-xs font-black bg-slate-800 text-slate-300 hover:text-white transition">
+                        Xbox (72h)
+                    </button>
+                    <button id="platform-all" class="platform-btn px-2.5 py-1 rounded-md text-xs font-black bg-slate-800 text-slate-300 hover:text-white transition">
+                        Universal (24h)
+                    </button>
+                </div>
+            </div>
+
+            <!-- COUNTRY-WISE TIMEZONE COUNTDOWN LIST -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 backdrop-blur-md shadow-xl flex-1 flex flex-col overflow-hidden min-h-[460px]">
+                
+                <!-- Section Header & Filter Controls -->
+                <div class="flex flex-wrap items-center justify-between pb-2.5 border-b border-slate-800 gap-2">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xl">🌍</span>
+                        <div class="font-black text-white text-sm tracking-wider uppercase">Country-Wise Pre-Download Times</div>
+                    </div>
+
+                    <div class="flex items-center gap-1.5">
+                        <button id="toggle-autoscroll-btn" class="px-2.5 py-1 rounded-lg bg-pink-600 hover:bg-pink-500 text-xs text-white font-black transition flex items-center gap-1 shadow-sm" title="Toggle automatic continuous scrolling for live streams">
+                            <span id="autoscroll-icon">▶</span> <span id="autoscroll-text">Auto-Scroll: ON</span>
+                        </button>
+                        <button id="filter-pinned-btn" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 font-bold transition flex items-center gap-1">
+                            <span>★</span> Pinned
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quick Region & Speed Pills -->
+                <div class="flex flex-wrap items-center justify-between gap-1 text-[11px] font-bold text-slate-400 my-2">
+                    <div class="flex items-center gap-1">
+                        <button class="region-filter-btn px-2 py-0.5 rounded bg-slate-800 text-cyan-300 font-bold" data-region="all">All (39)</button>
+                        <button class="region-filter-btn px-2 py-0.5 rounded bg-slate-900 text-slate-400 hover:text-white" data-region="americas">Americas</button>
+                        <button class="region-filter-btn px-2 py-0.5 rounded bg-slate-900 text-slate-400 hover:text-white" data-region="europe">Europe</button>
+                        <button class="region-filter-btn px-2 py-0.5 rounded bg-slate-900 text-slate-400 hover:text-white" data-region="apac">Asia-Pac</button>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <span class="text-[10px] text-slate-500 font-mono">SCROLL:</span>
+                        <button id="speed-slow" class="speed-btn px-1.5 py-0.5 rounded bg-slate-900 text-slate-400 hover:text-white">Slow</button>
+                        <button id="speed-med" class="speed-btn px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-300 font-bold border border-cyan-800">Normal</button>
+                        <button id="speed-fast" class="speed-btn px-1.5 py-0.5 rounded bg-slate-900 text-slate-400 hover:text-white">Fast</button>
+                    </div>
+                </div>
+
+                <!-- Search Input -->
+                <div class="mb-2 relative">
+                    <input id="country-search" type="text" placeholder="Search 39 countries, cities, or timezones..." class="w-full bg-slate-950 border-2 border-slate-800 focus:border-cyan-400 rounded-xl px-4 py-2 text-sm font-bold text-white placeholder-slate-400 focus:outline-none transition shadow-inner">
+                    <span class="absolute right-3.5 top-2.5 text-sm text-slate-400">🔍</span>
+                </div>
+
+                <!-- Scrollable Country Cards List -->
+                <div id="country-grid" class="flex-1 overflow-y-auto space-y-2.5 pr-1 max-h-[400px] lg:max-h-[500px]">
+                    <!-- Dynamically populated by app.js with high-contrast large fonts -->
+                </div>
+
+                <div class="mt-2.5 pt-2 border-t border-slate-800/80 text-center text-xs text-slate-400 font-mono font-bold">
+                    All clocks calculated via native UTC synchronization
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- BOTTOM LIVE STREAM TICKER & BRANDING -->
+    <footer id="bottom-ticker" class="bg-slate-950 border-t-2 border-slate-800 px-4 py-2.5 z-30 flex items-center gap-4 text-sm font-bold overflow-hidden shadow-2xl">
+        <!-- Channel Badge -->
+        <div class="flex items-center gap-2 bg-gradient-to-r from-pink-600 to-purple-700 text-white px-4 py-1.5 rounded-lg shadow-lg whitespace-nowrap">
+            <span class="w-3 h-3 rounded-full bg-white animate-ping"></span>
+            <span id="channel-name-display" class="font-bebas tracking-wider text-xl sm:text-2xl">YOUR CHANNEL LIVE</span>
+        </div>
+
+        <!-- Scrolling Ticker Container -->
+        <div class="flex-1 overflow-hidden relative">
+            <div id="ticker-text-display" class="animate-marquee text-slate-100 font-mono font-bold text-sm sm:text-base tracking-wide">
+                🔥 GTA VI PRE-DOWNLOAD & RELEASE COUNTDOWN | SUBSCRIBE & DROP A LIKE! | 100% NON-COPYRIGHT STREAM VISUALS & AUDIO ACTIVE
+            </div>
+        </div>
+
+        <!-- Quick Hotkey Badges -->
+        <div class="hidden md:flex items-center gap-2.5 text-xs text-slate-300 font-mono font-bold whitespace-nowrap">
+            <span><kbd class="px-2 py-0.5 bg-slate-900 border border-slate-700 rounded text-pink-400">O</kbd> OBS Mode</span>
+            <span><kbd class="px-2 py-0.5 bg-slate-900 border border-slate-700 rounded text-cyan-400">S</kbd> Safe Audio</span>
+            <span><kbd class="px-2 py-0.5 bg-slate-900 border border-slate-700 rounded text-white">Space</kbd> Play/Pause</span>
+        </div>
+    </footer>
+
+    <!-- ==================== MODALS ==================== -->
+
+    <!-- SETTINGS MODAL -->
+    <div id="settings-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-md p-6 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="font-bebas text-xl text-white tracking-wider">STREAM & TIMER SETTINGS</div>
+                <button id="btn-close-settings" class="text-slate-400 hover:text-white text-lg">✕</button>
+            </div>
+
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block font-semibold text-slate-300 mb-1">Streamer Channel Name</label>
+                    <input id="setting-channel-name" type="text" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-white focus:outline-none focus:border-pink-500">
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-slate-300 mb-1">Bottom Marquee Ticker Announcement</label>
+                    <input id="setting-ticker-text" type="text" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-white focus:outline-none focus:border-pink-500">
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-slate-300 mb-1">Target Official Launch Date (Local/UTC)</label>
+                    <input id="setting-target-date" type="datetime-local" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-white focus:outline-none focus:border-cyan-400">
+                    <p class="text-[10px] text-slate-500 mt-1">Pre-download unlock will automatically calculate backwards from this date.</p>
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-slate-300 mb-1">Pre-Download Lead Hours</label>
+                    <select id="setting-lead-hours" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-white focus:outline-none focus:border-cyan-400">
+                        <option value="24">24 Hours (1 Day before launch)</option>
+                        <option value="48">48 Hours (2 Days before launch - Standard PlayStation/Xbox)</option>
+                        <option value="72">72 Hours (3 Days before launch)</option>
+                        <option value="96">96 Hours (4 Days before launch)</option>
+                    </select>
+                </div>
+
+                <div class="flex items-center justify-between pt-2 border-t border-slate-800">
+                    <span class="font-semibold text-slate-300">Retro CRT Scanline Effect</span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input id="setting-crt-toggle" type="checkbox" class="sr-only peer">
+                        <div class="w-9 h-5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-pink-600"></div>
+                    </label>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-3 border-t border-slate-800">
+                <button id="btn-save-settings" class="px-5 py-2 rounded-lg bg-pink-600 hover:bg-pink-500 text-white font-bold text-xs uppercase tracking-wider transition">
+                    Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- COPYRIGHT & FAIR USE GUIDE MODAL -->
+    <div id="copyright-modal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-2xl p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-xl">🛡️</span>
+                    <div class="font-bebas text-xl text-white tracking-wider">YOUTUBE COPYRIGHT & CONTENT ID GUIDE</div>
+                </div>
+                <button id="btn-close-copyright" class="text-slate-400 hover:text-white text-lg">✕</button>
+            </div>
+
+            <div class="space-y-3 text-xs text-slate-300 leading-relaxed">
+                <div class="p-3 rounded-xl bg-rose-950/50 border border-rose-500/40 text-rose-200">
+                    <div class="font-bold text-white text-sm mb-1">Why does GTA VI Trailer 1 trigger YouTube strikes?</div>
+                    The soundtrack in the official trailer is <strong>"Love Is a Long Road" by Tom Petty</strong>. This song is registered in YouTube's Content ID database by Universal Music Publishing Group (UMPG). If you stream the trailer with this song playing repeatedly, YouTube will automatically flag the stream, mute the audio, or divert monetization.
+                </div>
+
+                <div class="p-3 rounded-xl bg-emerald-950/50 border border-emerald-500/40 text-emerald-200">
+                    <div class="font-bold text-white text-sm mb-1">How This Overlay Protects Your YouTube Channel:</div>
+                    <ul class="list-disc list-inside space-y-1 text-slate-300">
+                        <li><strong>Stream-Safe Synthwave Mode (Default)</strong>: Automatically mutes the trailer's copyrighted music and plays built-in 80s retro synthwave beats generated locally via Web Audio API. Zero copyrighted samples, 100% immune to Content ID.</li>
+                        <li><strong>Silent / Streamer Mic Mode</strong>: Mutes trailer audio completely, leaving your microphone and commentary crystal clear.</li>
+                    </ul>
+                </div>
+
+                <div class="p-3 rounded-xl bg-slate-950 border border-slate-800">
+                    <div class="font-bold text-cyan-300 text-sm mb-1">Rockstar Games Policy on Visuals:</div>
+                    Rockstar Games allows trailer reactions and community countdowns under their Fair Use policy, provided the stream is transformative (commentary, chat interaction, countdown timers) and not a raw, unedited re-upload attempting to claim ownership.
+                </div>
+
+                <div class="p-3 rounded-xl bg-yellow-950/40 border border-yellow-600/40 text-yellow-200">
+                    <div class="font-bold text-white text-xs mb-1">💡 Pro-Streamer YouTube Tip:</div>
+                    Before starting your public stream, do a <strong>2-minute test broadcast set to "Unlisted"</strong> in YouTube Studio. Check YouTube Studio's "Copyright" tab to verify it says <em>"No copyright claims found"</em> before switching your stream to Public!
+                </div>
+
+                <!-- YouTube Stream Metadata Kit -->
+                <div class="p-3.5 rounded-xl bg-purple-950/40 border border-purple-500/50 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <div class="font-bold text-pink-300 text-sm flex items-center gap-1.5">
+                            <span>📋</span> YouTube Live Stream Metadata Kit
+                        </div>
+                        <button id="btn-copy-stream-kit" class="px-3 py-1.5 rounded-lg bg-pink-600 hover:bg-pink-500 text-white font-bold text-xs transition shadow-md">
+                            Copy Stream Template
+                        </button>
+                    </div>
+                    <p class="text-[11px] text-slate-400">Pre-formatted title, fair-use disclaimer, and top gaming hashtags ready to paste directly into your YouTube Studio live stream setup.</p>
+                </div>
+            </div>
+
+            <div class="flex justify-end pt-2 border-t border-slate-800">
+                <button onclick="window.gtaApp.toggleModal('copyright', false)" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition">
+                    Got It, Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- OBS STUDIO SETUP GUIDE MODAL -->
+    <div id="obs-modal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-xl p-6 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-xl">🎥</span>
+                    <div class="font-bebas text-xl text-white tracking-wider">HOW TO ADD TO OBS STUDIO / STREAMLABS</div>
+                </div>
+                <button id="btn-close-obs-guide" class="text-slate-400 hover:text-white text-lg">✕</button>
+            </div>
+
+            <div class="space-y-3 text-xs text-slate-300 leading-relaxed">
+                <div class="flex gap-3 items-start bg-slate-950 p-3 rounded-xl border border-slate-800">
+                    <span class="font-bold text-pink-400 font-mono text-sm">Step 1</span>
+                    <div>
+                        <div class="font-semibold text-white">Add a New Browser Source in OBS</div>
+                        In OBS Studio under <strong>Sources</strong>, click <strong>+</strong> and select <strong>Browser</strong>. Name it <em>"GTA VI Countdown"</em>.
+                    </div>
+                </div>
+
+                <div class="flex gap-3 items-start bg-slate-950 p-3 rounded-xl border border-slate-800">
+                    <span class="font-bold text-pink-400 font-mono text-sm">Step 2</span>
+                    <div>
+                        <div class="font-semibold text-white">Configure Browser Source Properties</div>
+                        <ul class="list-disc list-inside mt-1 space-y-1 text-slate-400">
+                            <li>Check <strong>[x] Local file</strong> and browse to: <code class="text-cyan-300">d:\Antigravity\GTA VI\index.html</code></li>
+                            <li>Set <strong>Width</strong>: <code class="text-pink-400">1920</code></li>
+                            <li>Set <strong>Height</strong>: <code class="text-pink-400">1080</code></li>
+                            <li>Check <strong>[x] Control audio via OBS</strong> (optional, allows managing overlay volume in OBS Audio Mixer).</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 items-start bg-slate-950 p-3 rounded-xl border border-slate-800">
+                    <span class="font-bold text-pink-400 font-mono text-sm">Step 3</span>
+                    <div>
+                        <div class="font-semibold text-white">Activate Clean OBS Mode</div>
+                        Press <kbd class="px-1.5 py-0.5 bg-slate-800 text-pink-400 font-mono rounded">O</kbd> or click <strong>Clean OBS Mode</strong> in the top bar to hide navigation controls and ensure a pristine broadcast overlay!
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end pt-2 border-t border-slate-800">
+                <button onclick="window.gtaApp.toggleModal('obs', false)" class="px-4 py-2 rounded-lg bg-pink-600 hover:bg-pink-500 text-white font-bold text-xs uppercase tracking-wider transition">
+                    Done
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Scripts -->
+    <script src="retro-visuals.js"></script>
+    <script src="audio-synth.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
+

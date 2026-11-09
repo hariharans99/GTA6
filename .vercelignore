@@ -1,0 +1,6 @@
+# Files not needed on Vercel CDN
+start_server.ps1
+.git
+.gitignore
+README.md
+
